@@ -5,14 +5,14 @@ CC=clang
 ###Extra c flags  -Isrc
 CFLAGS=-g -O0  -Wall -Wextra   $(OPTFLAGS)
 ifeq ($(UNAME_S),Darwin)
-	INCLUDES=-I/opt/homebrew/opt/gsl/include 
-	LDLIBS=-L/opt/homebrew/opt/gsl/lib $(OPTLIBS)
+	INCLUDES=-I/opt/homebrew/opt/gsl/include -I/opt/homebrew/opt/raylib/include
+	LDLIBS=-L/opt/homebrew/opt/gsl/lib -L/opt/homebrew/opt/raylib/lib$(OPTLIBS)
 endif
 ifeq ($(UNAME_S),Linux)
 	INCLUDES=-I/usr/include/gsl
 	LDLIBS=-L/usr/lib64 $(OPTLIBS)
 endif
-LIBS=-lgsl -lgslcblas -lm $(OPTLIBS)
+LIBS=-lgsl -lgslcblas -lm -lraylib$(OPTLIBS)
 
 SOURCES=$(wildcard src/**/*.c src/*.c)
 OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
@@ -21,11 +21,11 @@ TEST_SRC=$(wildcard tests/*_tests.c)
 TESTS=$(patsubst %.c,%,$(TEST_SRC))
 
 ###Change TARGET
-TARGET=build/ScienceDog
+TARGET=build/TailWag
 SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 
 ###Change EXECUTABLE
-EXECUTABLE=bin/ScienceDog
+EXECUTABLE=bin/TailWag
 
 #Target Build Components and Flag options
 .PHONY: all dev clean install
