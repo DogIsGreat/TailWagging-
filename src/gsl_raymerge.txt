@@ -1,0 +1,77 @@
+#include "datafile.h"
+#include <stdio.h>
+#include <string.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_odeiv2.h>
+#include <raylib.h>
+#include <rlgl.h>
+#include <raymath.h>
+
+#include <stdio.h>
+#include <gsl/gsl_odeiv2.h>
+#include <gsl/gsl_errno.h>
+
+// Define the system of equations to solve
+int func(double t, const double y[], double f[], void *params) {
+    double k = *(double *)params;
+    f[0] = -k * y[0];
+    return GSL_SUCCESS;
+}
+
+int main(void) {
+    // ODE parameters
+    double k = 0.1; // Decay rate
+    double y[1] = {1000}; // Initial condition: y(0) = 10
+    double t = 0.0, t1 = 10.0;
+    double dt = 0.1;
+
+    gsl_odeiv2_system sys = {func, NULL, 1, &k};
+
+    gsl_odeiv2_driver *d = gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk8pd, 1e-6, 1e-6, 0.0);
+
+    // Raylib initialization
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+
+    InitWindow(screenWidth, screenHeight, "ODE Solution Plot with Raylib");
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        // Draw graph axes
+        DrawLine(40, screenHeight / 2, screenWidth - 40, screenHeight / 2, BLACK);
+        DrawLine(40, 20, 40, screenHeight - 20, BLACK);
+
+        // Solve ODE and plot
+        for (int i = 1; i <= (t1 / dt); ++i) {
+            double ti = i * dt;
+            int status = gsl_odeiv2_driver_apply_fixed_step(d, &t, ti,1, y);
+
+            if (status != GSL_SUCCESS) {
+                printf("error, return value=%d\n", status);
+                break;
+            }
+
+            // Convert to screen coordinates
+            int x = 40 + (int)(ti * (screenWidth - 80) / t1);
+            int y_screen = screenHeight / 2 - (int)(y[0] * (screenHeight / 2 - 20) / 10);
+
+            DrawCircle(x, y_screen, 2, BLUE);
+        }
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+
+    gsl_odeiv2_driver_free(d);
+
+    return 0;
+}

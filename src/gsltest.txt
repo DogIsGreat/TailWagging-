@@ -9,7 +9,6 @@ struct params{
 };
 
 int func (double t, const double y[], double f[], void *params){
-    (void)(t);
     struct params *p = (struct params *)params;
     //int y[4] = {0,1,2,3};
     //int v[4] = {3,4,5,6}; 
@@ -37,8 +36,7 @@ main (void)
   for (i = 1; i <= 100; i++)
     {
         double ti = i * t1 / 100.0;
-        int status = gsl_odeiv2_driver_apply(odedrive, &t, ti, y);
-
+        int status = gsl_odeiv2_driver_apply_fixed_step(odedrive, &t, ti,1, y);
 
       if (status != GSL_SUCCESS)
         {
@@ -46,8 +44,8 @@ main (void)
           break;
         }
 
-      printf ("%.5e %.5e %.5e\n", t, y[0]+1, y[1]+1);
-    }
+      printf ("%.5e %.5e %.5e\n", t, y[0]*100, y[1]*200);
+    }// The problem with this architecture is that these results must be statically drawn...
 
   gsl_odeiv2_driver_free (odedrive);
   return 0;

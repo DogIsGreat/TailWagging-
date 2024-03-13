@@ -18,7 +18,6 @@ struct params{
 };
 
 int func (double t, const double y[], double f[], void *params){
-    (void)(t);
     struct params *p = (struct params *)params;
     //int y[4] = {0,1,2,3};
     //int v[4] = {3,4,5,6}; 
@@ -60,8 +59,10 @@ int main(){
         if (!pause){
             for ( int i = 1; i <= 100; i++){
                 double ti = i * t1 / 100.0;
-                double dt = ti -t;
-                int status = gsl_odeiv2_driver_apply_fixed_step(odedrive, &t, dt, 1, y);
+                //double dt = ti -t;
+                //int status = gsl_odeiv2_driver_apply_fixed_step(odedrive, &t, dt, 1, y);
+
+                int status = gsl_odeiv2_driver_apply_fixed_step(odedrive, &t, ti,1, y);
 
                 if (status != GSL_SUCCESS)
                 {
@@ -69,20 +70,15 @@ int main(){
                     pause = !pause;
                     break;
                 } 
-                /*
-                int screenXr1 = t ;
-                int screenYr1 = (int)(y[0]*10);
-                DrawPixel(screenXr1, screenYr1, GREEN );
-                int screenXr2 = t ;
-                int screenYr2 = (int)(y[1]*10);
-                DrawPixel(screenXr2, screenYr2, BLUE );*/
                 
                 int screenX = (int)((t / t1) * SCREEN_WIDTH);
-                int screenY1 = SCREEN_HEIGHT / 2 - (int)(y[0] * 100); // Adjust scaling factor as needed
-                int screenY2 = SCREEN_HEIGHT / 2 - (int)(y[1] * 100); // Adjust scaling factor as needed
+                int screenY1 = SCREEN_HEIGHT / 2 - (int)((y[0] + 5)* SCREEN_HEIGHT/ 10 ); // Adjust scaling factor as needed
+                int screenY2 = SCREEN_HEIGHT / 2 - (int)((y[1] + 5) * SCREEN_HEIGHT / 10 ); // Adjust scaling factor as needed
                 
+                //Not drawing the loop...
                 DrawCircle(screenX, screenY1, 2, GREEN); // For y[0]
                 DrawCircle(screenX, screenY2, 2, BLUE);  // For y[1]
+                DrawCircle((SCREEN_WIDTH / 2)+(i*5), SCREEN_HEIGHT / 2, 20, YELLOW);
 
             }
         }
