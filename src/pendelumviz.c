@@ -43,7 +43,7 @@ int main(){
 
     int i;
     double t = 0.0, t1 = 100;
-    double dt = 1.0;
+    double dt = 1;
     const int step_total = 101;
 
     double* timeX = malloc(step_total*sizeof(double));
@@ -100,7 +100,7 @@ int main(){
     gsl_odeiv2_control_free(control);
     gsl_odeiv2_step_free(step);
     gsl_odeiv2_evolve_free(evolve);
-    free(inputs);
+    
     while (i < total){
     printf("At time t=%.3f s, position=%.3f m, velocity=%.3f m/s\n", timeX[i], yOne[i], yTwo[i]);
     i++;
@@ -142,6 +142,7 @@ int main(){
 
     CloseWindow();
 
+    free(inputs);
     free(timeX);
     free(yOne);
     free(yTwo);

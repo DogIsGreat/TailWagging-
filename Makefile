@@ -3,7 +3,7 @@ UNAME_S := $(shell uname -s)
 #Header components, Flags, Sources, Libraries, and Locations to be compiled.
 CC=clang 
 ###Extra c flags  -Isrc
-CFLAGS=-g -O0  -Wall -Wextra   $(OPTFLAGS)
+CFLAGS=-g -O0  -Wall -Wextra -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat-security -W1,-z,now -fPIE $(OPTFLAGS)
 ifeq ($(UNAME_S),Darwin)
 	INCLUDES=-I/opt/homebrew/opt/gsl/include -I/opt/homebrew/opt/raylib/include
 	LDLIBS=-L/opt/homebrew/opt/gsl/lib -L/opt/homebrew/opt/raylib/lib$(OPTLIBS)
