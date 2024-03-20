@@ -36,14 +36,14 @@ int main(){
     if (inputs != NULL){
         inputs->g=9.8;
         inputs->length=2;
-        inputs->damping=0.1;
-        inputs->startPosition = 0.2;
+        inputs->damping=0.5;
+        inputs->startPosition = 2;
         inputs->startVelocity = 0;
     }
 
     int i;
     double t = 0.0, t1 = 100;
-    double dt = 1;
+    double dt = 0.1;
     const int step_total = 101;
 
     double* timeX = malloc(step_total*sizeof(double));
@@ -100,6 +100,7 @@ int main(){
     gsl_odeiv2_control_free(control);
     gsl_odeiv2_step_free(step);
     gsl_odeiv2_evolve_free(evolve);
+    free(inputs);
     
     while (i < total){
     printf("At time t=%.3f s, position=%.3f m, velocity=%.3f m/s\n", timeX[i], yOne[i], yTwo[i]);
@@ -123,7 +124,7 @@ int main(){
 
         while(i <= total){
             //int screenX = (SCREEN_WIDTH / 2 ) + timeX[i] * 5;
-            int screenX = timeX[i] * 10;
+            int screenX = timeX[i]*5 ;
             int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (SCREEN_HEIGHT );
             int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (SCREEN_HEIGHT );
 
@@ -142,7 +143,7 @@ int main(){
 
     CloseWindow();
 
-    free(inputs);
+ 
     free(timeX);
     free(yOne);
     free(yTwo);
