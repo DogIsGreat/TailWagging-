@@ -15,17 +15,19 @@ struct params{
     double g;
     double length;
     double damping;
+    double damping2;
+    double omega;
     double startPosition;
     int startVelocity;
 };
 
 int func(double t, const double y[], double f[], void *params){
-    (void) (t);
+    //(void) (t);
     struct params *init  = (struct params*)params;
     // Starting velocity
     f[0] = y[1];
     // Free Fall
-    f[1] = -(init->damping)*y[1] - (init->g / init->length)*sin(y[0]);
+    f[1] = -(init->damping)*y[1] - (init->g / init->length)*sin(y[0]) - (init->damping2)*sin(init->omega)*t;
     return GSL_SUCCESS;
 }
 
@@ -37,14 +39,16 @@ int main(){
         inputs->g=9.8;
         inputs->length=2;
         inputs->damping=0.5;
+        inputs->damping2=1;
+        inputs->omega=1;
         inputs->startPosition = 2;
         inputs->startVelocity = 0;
     }
 
     int i;
     double t = 0.0, t1 = 100;
-    double dt = 0.1;
-    const int step_total = 101;
+    double dt = 0.01;
+    const int step_total = 500;
 
     double* timeX = malloc(step_total*sizeof(double));
     double* yOne = malloc(step_total*sizeof(double));
@@ -94,14 +98,16 @@ int main(){
         } 
 
     }
-    int total = i-1;
-    i = 0;
+
     gsl_odeiv2_evolve_reset(evolve);
     gsl_odeiv2_control_free(control);
     gsl_odeiv2_step_free(step);
     gsl_odeiv2_evolve_free(evolve);
     free(inputs);
-    
+
+    int total = i-1;
+    i = 0;
+
     while (i < total){
     printf("At time t=%.3f s, position=%.3f m, velocity=%.3f m/s\n", timeX[i], yOne[i], yTwo[i]);
     i++;
@@ -110,30 +116,66 @@ int main(){
 
     i=0;
 
+    Camera2D camera = { 0 };
+    camera.zoom = 1.0f;
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, " Pendelum ODE Oscilation Plot. ");
 
     SetTargetFPS(60);
 
     while(!WindowShouldClose()){
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+
+            Vector2 delta = GetMouseDelta();
+            delta = Vector2Scale(delta, -1.0f/camera.zoom);
+        
+            camera.target = Vector2Add(camera.target, delta);
+        }
+
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0)
+        {
+            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+
+            camera.offset = GetMousePosition();
+
+            camera.target = mouseWorldPos;
+
+            const float zoomIncrement = 0.125f;
+
+            camera.zoom += (wheel*zoomIncrement);
+            if (camera.zoom < zoomIncrement) camera.zoom = zoomIncrement;
+        }
+
+
+
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+            BeginMode2D(camera);
 
-        //DrawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, BLACK);
-        DrawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT /2, BLACK);
+                ClearBackground(RAYWHITE);
 
-        while(i <= total){
-            //int screenX = (SCREEN_WIDTH / 2 ) + timeX[i] * 5;
-            int screenX = timeX[i]*5 ;
-            int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (SCREEN_HEIGHT );
-            int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (SCREEN_HEIGHT );
+                //DrawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, BLACK);
+                DrawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT /2, BLACK);
 
-            DrawCircle(screenX, screenY1, 5, GREEN);
-            DrawCircle(screenX, screenY2, 5, BLUE);
-            i++;
+                while(i <= total){
+                    //int screenX = (SCREEN_WIDTH / 2 ) + timeX[i] * 5;
+                    int screenX = timeX[i]*5 ;
+                    //int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (SCREEN_HEIGHT );
+                    //int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (SCREEN_HEIGHT );
+                    int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (10);
+                    int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (20);
 
-        }
-        i = 0;
+                    DrawCircle(screenX, screenY1, 5, GREEN);
+                    DrawCircle(screenX, screenY2, 5, BLUE);
+                    i++;
+
+                }
+                i = 0;
+                
+            EndMode2D(); 
+
         
         EndDrawing();
 

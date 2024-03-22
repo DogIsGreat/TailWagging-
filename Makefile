@@ -1,5 +1,5 @@
 UNAME_S := $(shell uname -s)
-
+#OPTLIBS= -fsanitize=address // undefined // leak
 #Header components, Flags, Sources, Libraries, and Locations to be compiled.
 CC=clang 
 ###Extra c flags  -Isrc
