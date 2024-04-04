@@ -34,15 +34,15 @@ int func(double t, const double y[], double f[], void *params){
 int main(){
     // Paramter initialization
     struct params *inputs = malloc(sizeof(struct params));
-    
+
     if (inputs != NULL){
         inputs->g=9.8;
         inputs->length=2;
         inputs->damping=0.5;
-        inputs->damping2=1;
-        inputs->omega=1;
-        inputs->startPosition = 2;
-        inputs->startVelocity = 0;
+        inputs->damping2=0.0;
+        inputs->omega=0.7;
+        inputs->startPosition = 0.78;
+        inputs->startVelocity = 50;
     }
 
     int i;
@@ -60,7 +60,6 @@ int main(){
     int SCREEN_WIDTH = 1280;
     int SCREEN_HEIGHT = 720;
 
-
     // System initialization
     gsl_odeiv2_system system = {func, NULL, 2, inputs};
 
@@ -73,11 +72,11 @@ int main(){
     double y[2] = {inputs->startPosition, inputs->startVelocity};
 
     //printf ( " Step method is '%s'\n", gsl_odeiv2_step_name(step));
-    i = 0; 
+    i = 0;
     while(t < t1){
 
         int status = gsl_odeiv2_evolve_apply(evolve, control, step, &system, &t, t1, &dt, y);
-        
+
         if (status != GSL_SUCCESS){
             printf("error, return value=%d\n", status);
             break;
@@ -95,7 +94,7 @@ int main(){
         if (elapsed_time > timeout){
             printf(" Infinite loop timeout reached. \n");
             break;
-        } 
+        }
 
     }
 
@@ -129,7 +128,7 @@ int main(){
 
             Vector2 delta = GetMouseDelta();
             delta = Vector2Scale(delta, -1.0f/camera.zoom);
-        
+
             camera.target = Vector2Add(camera.target, delta);
         }
 
@@ -159,24 +158,25 @@ int main(){
                 //DrawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, BLACK);
                 DrawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT /2, BLACK);
 
+                //Need conditional statement to only print the output values within range. Also recalculate a total.
                 while(i <= total){
                     //int screenX = (SCREEN_WIDTH / 2 ) + timeX[i] * 5;
                     int screenX = timeX[i]*5 ;
                     //int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (SCREEN_HEIGHT );
                     //int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (SCREEN_HEIGHT );
-                    int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (10);
-                    int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (20);
+                    int screenY1 = (SCREEN_HEIGHT/5) + yOne[i]*5;
+                    int screenY2 = (SCREEN_HEIGHT/5) + yTwo[i]*5;
 
-                    DrawCircle(screenX, screenY1, 5, GREEN);
-                    DrawCircle(screenX, screenY2, 5, BLUE);
+                    DrawCircle(screenX, screenY1, 2, GREEN);
+                    DrawCircle(screenX, screenY2, 2, BLUE);
                     i++;
 
                 }
                 i = 0;
-                
-            EndMode2D(); 
 
-        
+            EndMode2D();
+
+
         EndDrawing();
 
     }
@@ -185,7 +185,7 @@ int main(){
 
     CloseWindow();
 
- 
+
     free(timeX);
     free(yOne);
     free(yTwo);
