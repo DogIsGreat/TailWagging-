@@ -81,8 +81,6 @@ int main(){
             printf("error, return value=%d\n", status);
             break;
         }
-        //if (y[0] <= 0) break;
-        //printf("At time t=%.3f s, position=%.3f m, velocity=%.3f m/s\n", t, y[0], y[1]);
         timeX[i] = t;
         yOne[i] = y[0];
         yTwo[i] = y[1];
@@ -112,9 +110,7 @@ int main(){
     i++;
     }
 
-
     i=0;
-
     Camera2D camera = { 0 };
     camera.zoom = 1.0f;
 
@@ -147,23 +143,16 @@ int main(){
             if (camera.zoom < zoomIncrement) camera.zoom = zoomIncrement;
         }
 
-
-
         BeginDrawing();
 
             BeginMode2D(camera);
 
                 ClearBackground(RAYWHITE);
 
-                //DrawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, BLACK);
                 DrawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT /2, BLACK);
 
-                //Need conditional statement to only print the output values within range. Also recalculate a total.
                 while(i <= total){
-                    //int screenX = (SCREEN_WIDTH / 2 ) + timeX[i] * 5;
                     int screenX = timeX[i]*5 ;
-                    //int screenY1 = (SCREEN_HEIGHT / 2) + yOne[i] * (SCREEN_HEIGHT );
-                    //int screenY2 = (SCREEN_HEIGHT / 2) + yTwo[i] * (SCREEN_HEIGHT );
                     int screenY1 = (SCREEN_HEIGHT/5) + yOne[i]*5;
                     int screenY2 = (SCREEN_HEIGHT/5) + yTwo[i]*5;
 
@@ -176,15 +165,11 @@ int main(){
 
             EndMode2D();
 
-
         EndDrawing();
 
     }
 
-    //int reset = gsl_odeiv2_driver_reset(driver);
-
     CloseWindow();
-
 
     free(timeX);
     free(yOne);
